@@ -1,0 +1,10 @@
+#configuration of SQ-618 ID=4
+PAR_4 = minimalmodbus.Instrument('/dev/ttyACM0',4)	
+PAR_4.serial.baudrate = 19400 				# BaudRate
+PAR_4.serial.bytesize = 8					# Number of data bits to be requested
+PAR_4.serial.parity = minimalmodbus.serial.PARITY_NONE	# Parity Setting here is NONE but can be ODD or EVEN
+PAR_4.serial.stopbits = 1					# Number of stop bits
+PAR_4.serial.timeout  = 0.5					# Timeout time in seconds
+PAR_4.mode = minimalmodbus.MODE_RTU				# Mode to be used (RTU or ascii mode)
+PAR_4.clear_buffers_before_each_transaction = True
+PAR_4.close_port_after_each_call = True
