@@ -27,12 +27,12 @@ def display_recent_data():
     # Print the recent data in the specified format
     for index, row in recent_data.iterrows():
         time_str = row['datetime'].strftime('%H:%M')
-        print(f"Time: {time_str}")
-        print(f"PAR: {row['PAR_north (umol.m-1.s-1)']}")
-        print(f"Solar radiation: {row['Solar radiation_north (w.m-2)']}")
-        print(f"Temperature: {row['Temperature_north (c)']}")
-        print(f"Humidity: {row['Humidity_north (%)']}")
-        print(f"CO2 concentration: {row['CO2 conc_north (ppm)']}")
+        print(f" Time: {time_str}")
+        print(f" PAR: {row['PAR_north (umol.m-1.s-1)']} umol.m-1.s-1")
+        print(f" Solar radiation: {row['Solar radiation_north (w.m-2)']} w.m-2")
+        print(f" Temperature: {row['Temperature_north (c)']} C")
+        print(f" Humidity: {row['Humidity_north (%)']} %")
+        print(f" CO2 concentration: {row['CO2 conc_north (ppm)']} ppm")
         
         print("-" * 30)  # Separator between records
 
