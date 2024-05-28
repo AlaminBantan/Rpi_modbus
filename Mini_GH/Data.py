@@ -40,3 +40,4 @@ if __name__ == "__main__":
     while True:
         display_recent_data()
         time.sleep(60)  # Wait for 1 minute before updating again
+
