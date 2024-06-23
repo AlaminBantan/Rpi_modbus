@@ -1,0 +1,18 @@
+import minimalmodbus 
+from time import sleep
+import datetime
+import csv
+import serial
+import io
+import os
+
+# Configuration of SQ-618 ID=1
+PAR_1 = minimalmodbus.Instrument('/dev/ttyACM0', 1)
+PAR_1.serial.baudrate = 19200
+PAR_1.serial.bytesize = 8
+PAR_1.serial.parity = minimalmodbus.serial.PARITY_EVEN
+PAR_1.serial.stopbits = 1
+PAR_1.serial.timeout = 0.5
+PAR_1.mode = minimalmodbus.MODE_RTU
+PAR_1.clear_buffers_before_each_transaction = True
+PAR_1.close_port_after_each_call = True
