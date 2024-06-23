@@ -23,8 +23,8 @@ PAR_1.mode = minimalmodbus.MODE_RTU
 PAR_1.clear_buffers_before_each_transaction = True
 PAR_1.close_port_after_each_call = True
 
-# Configuration of SP-522 ID=2
-Solar_11 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 2)
+# Configuration of SP-522 ID=11
+Solar_11 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 11)
 Solar_11.serial.baudrate = 19200
 Solar_11.serial.bytesize = 8
 Solar_11.serial.parity = minimalmodbus.serial.PARITY_EVEN
