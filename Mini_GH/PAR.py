@@ -8,7 +8,7 @@ import os
 import logging
 
 # Configuration of SQ-618 ID=1
-PAR_1 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 1)
+PAR_1 = minimalmodbus.Instrument('/dev/ttyACM_0', 1)
 PAR_1.serial.baudrate = 19200
 PAR_1.serial.bytesize = 8
 PAR_1.serial.parity = minimalmodbus.serial.PARITY_EVEN
@@ -19,7 +19,7 @@ PAR_1.clear_buffers_before_each_transaction = True
 PAR_1.close_port_after_each_call = True
 
 # Configuration of SQ-618 ID=2
-PAR_2 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 2)
+PAR_2 = minimalmodbus.Instrument('/dev/ttyACM_0', 2)
 PAR_2.serial.baudrate = 19200
 PAR_2.serial.bytesize = 8
 PAR_2.serial.parity = minimalmodbus.serial.PARITY_EVEN
