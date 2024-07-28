@@ -13,7 +13,7 @@ logging.basicConfig(filename='/home/cdacea/north_GH/sensor_data.log',
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 # Configuration of SQ-618 ID=1
-PAR_1 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 1)
+PAR_1 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 2)
 PAR_1.serial.baudrate = 19200
 PAR_1.serial.bytesize = 8
 PAR_1.serial.parity = minimalmodbus.serial.PARITY_EVEN
