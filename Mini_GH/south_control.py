@@ -27,6 +27,7 @@ def read_csv_and_control_relay():
     # Get the CO2 concentration, convert to a number
     try:
         co2_concentration = float(latest_row['CO2 conc_south (ppm)'])
+        logging.info(f"CO2 concentration read: {co2_concentration} ppm")
     except ValueError:
         logging.warning("CO2 concentration is not a number. Skipping this row.")
         return
@@ -37,11 +38,9 @@ def read_csv_and_control_relay():
         logging.info(f"CO2 concentration {co2_concentration} ppm - Relay turned ON for 5 seconds.")
         time.sleep(5)  # Keep the relay on for 5 seconds
         GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
-    elif co2_concentration > 1100:
+    elif co2_concentration > 800:
         GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
         logging.info(f"CO2 concentration {co2_concentration} ppm - Relay turned OFF.")
-    else:
-        logging.info(f"CO2 concentration {co2_concentration} ppm - No action taken.")
 
 try:
     while True:
