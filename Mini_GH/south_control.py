@@ -6,14 +6,15 @@ from datetime import datetime
 # Setup GPIO
 RELAY_PIN = 17  # Use the GPIO pin you have connected the relay to
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)  # Suppress GPIO warnings
 GPIO.setup(RELAY_PIN, GPIO.OUT)
 
 # File path
 CSV_FILE_PATH = '/home/cdacea/south_GH/south_climate.csv'
 
 def read_csv_and_control_relay():
-    # Read the CSV file
-    df = pd.read_csv(CSV_FILE_PATH)
+    # Read the CSV file, suppress dtype warnings
+    df = pd.read_csv(CSV_FILE_PATH, low_memory=False)
     
     # Get the latest row
     latest_row = df.iloc[-1]
