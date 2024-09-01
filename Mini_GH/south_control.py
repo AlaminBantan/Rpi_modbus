@@ -19,8 +19,12 @@ def read_csv_and_control_relay():
     # Get the latest row
     latest_row = df.iloc[-1]
     
-    # Get the CO2 concentration
-    co2_concentration = latest_row['CO2 conc_south (ppm)']
+    # Get the CO2 concentration, convert to a number
+    try:
+        co2_concentration = float(latest_row['CO2 conc_south (ppm)'])
+    except ValueError:
+        print("Warning: CO2 concentration is not a number. Skipping this row.")
+        return
     
     # Control the relay
     if co2_concentration < 800:
