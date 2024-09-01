@@ -34,12 +34,12 @@ def read_csv_and_control_relay():
     
     # Control the relay
     if co2_concentration < 800:
-        GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn on the relay
+        GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn on the relay
         logging.info(f"CO2 concentration {co2_concentration} ppm - Relay turned ON for 5 seconds.")
         time.sleep(5)  # Keep the relay on for 5 seconds
-        GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
+        GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn off the relay
     elif co2_concentration > 800:
-        GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
+        GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn off the relay
         logging.info(f"CO2 concentration {co2_concentration} ppm - Relay turned OFF.")
 
 try:
@@ -48,7 +48,7 @@ try:
         if current_time >= datetime.strptime("08:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("17:00:00", "%H:%M:%S").time():
             read_csv_and_control_relay()
         else:
-            GPIO.output(RELAY_PIN, GPIO.LOW)  # Ensure the relay is turned off outside the specified hours
+            GPIO.output(RELAY_PIN, GPIO.HIGH)  # Ensure the relay is turned off outside the specified hours
             logging.info("Outside working hours - Relay turned OFF.")
         time.sleep(60)  # Wait for 1 minute
 except KeyboardInterrupt:
