@@ -24,6 +24,8 @@ def read_csv_and_control_relay():
     # Control the relay
     if co2_concentration < 800:
         GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn on the relay
+        time.sleep(5)  # Keep the relay on for 5 seconds
+        GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
     elif co2_concentration > 1100:
         GPIO.output(RELAY_PIN, GPIO.LOW)  # Turn off the relay
 
