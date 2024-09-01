@@ -45,7 +45,7 @@ def read_csv_and_control_relay():
 try:
     while True:
         current_time = datetime.now().time()
-        if current_time >= datetime.strptime("08:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("17:00:00", "%H:%M:%S").time():
+        if current_time >= datetime.strptime("07:00:00", "%H:%M:%S").time() and current_time <= datetime.strptime("17:00:00", "%H:%M:%S").time():
             read_csv_and_control_relay()
         else:
             GPIO.output(RELAY_PIN, GPIO.HIGH)  # Ensure the relay is turned off outside the specified hours
