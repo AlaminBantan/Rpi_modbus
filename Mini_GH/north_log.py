@@ -23,16 +23,16 @@ PAR_1.mode = minimalmodbus.MODE_RTU
 PAR_1.clear_buffers_before_each_transaction = True
 PAR_1.close_port_after_each_call = True
 
-# Configuration of SP-522 ID=11
-Solar_11 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 11)
-Solar_11.serial.baudrate = 19200
-Solar_11.serial.bytesize = 8
-Solar_11.serial.parity = minimalmodbus.serial.PARITY_EVEN
-Solar_11.serial.stopbits = 1
-Solar_11.serial.timeout = 0.5
-Solar_11.mode = minimalmodbus.MODE_RTU
-Solar_11.clear_buffers_before_each_transaction = True
-Solar_11.close_port_after_each_call = True
+# Configuration of SP-522 ID=13
+Solar_13 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 13)
+Solar_13.serial.baudrate = 19200
+Solar_13.serial.bytesize = 8
+Solar_13.serial.parity = minimalmodbus.serial.PARITY_EVEN
+Solar_13.serial.stopbits = 1
+Solar_13.serial.timeout = 0.5
+Solar_13.mode = minimalmodbus.MODE_RTU
+Solar_13.clear_buffers_before_each_transaction = True
+Solar_13.close_port_after_each_call = True
 
 # Configuration of GMP-252 ID=41
 carbo_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41)
@@ -87,11 +87,11 @@ try:
                 PAR_intensity_1 = "error"
 
             try:
-                Solar_Radiation_11 = round(Solar_11.read_float(0, 3, 2, 0), 1)
+                Solar_Radiation_13 = round(Solar_13.read_float(0, 3, 2, 0), 1)
                 sleep(1)
             except Exception as e:
-                logging.error(f"Error reading Solar_11: {e}")
-                Solar_Radiation_11 = "error"
+                logging.error(f"Error reading Solar_13: {e}")
+                Solar_Radiation_13 = "error"
 
             try:
                 carbon_conc_41 = round(carbo_41.read_float(1, 3, 2, 0), 1)
@@ -122,7 +122,7 @@ try:
                 rh_value_31 = "error"
                 temp_value_31 = "error"
 
-            writer.writerow({'datetime': formatted_datetime, 'PAR_north (umol.m-1.s-1)': PAR_intensity_1, 'Solar radiation_north (w.m-2)': Solar_Radiation_11, 'Temperature_north (c)': temp_value_31, 'Humidity_north (%)': rh_value_31, 'CO2 conc_north (ppm)': carbon_conc_41})
+            writer.writerow({'datetime': formatted_datetime, 'PAR_north (umol.m-1.s-1)': PAR_intensity_1, 'Solar radiation_north (w.m-2)': Solar_Radiation_13, 'Temperature_north (c)': temp_value_31, 'Humidity_north (%)': rh_value_31, 'CO2 conc_north (ppm)': carbon_conc_41})
 
             csv_file.flush()
             os.fsync(csv_file.fileno())
@@ -132,8 +132,8 @@ try:
 except KeyboardInterrupt:
     if PAR_1.serial.is_open:
         PAR_1.serial.close()
-    if Solar_11.serial.is_open:
-        Solar_11.serial.close()
+    if Solar_13.serial.is_open:
+        Solar_13.serial.close()
     if carbo_41.serial.is_open:
         carbo_41.serial.close()
 
