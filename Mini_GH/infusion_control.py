@@ -44,7 +44,7 @@ try:
         else:
             GPIO.output(RELAY_PIN, GPIO.HIGH)  # Turn OFF
             logging.info("Outside ON period - Relay turned OFF.")
-        time.sleep(60)  # Check every minute
+        time.sleep(10)  # Check every 10 secs
 except KeyboardInterrupt:
     pass
 finally:
