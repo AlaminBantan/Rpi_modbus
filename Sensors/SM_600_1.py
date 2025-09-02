@@ -31,7 +31,7 @@ try:
         fanrpm  = SM_600_1.read_float(14, 3, 2, 0)
 
         print("\n" * 50)
-        print("SM-600 Sensor Data--------------------------------")
+        print("SM-600_1 Sensor Data--------------------------------")
         print(f"PAR         : {par:.2f} µmol m^-2 s^-1")
         print(f"Temperature : {temp_c:.2f} °C")
         print(f"RH          : {rh_pct:.2f} %")
