@@ -16,4 +16,5 @@ PAR_1.close_port_after_each_call = True
 
 
 #write_register(registeraddress: int, value: Union[int, float], number_of_decimals: int = 0, functioncode: int = 16, signed: bool = False) → None
-PAR_1.write_register(48,6, 0, 16, False)
+
+PAR_1.write_register(120,6, 0, 16, False)
