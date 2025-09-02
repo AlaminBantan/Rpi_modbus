@@ -52,7 +52,7 @@ header = (
     [f"{name}_1" for name in base_names] +
     [f"{name}_2" for name in base_names] +
     [f"{name}_3" for name in base_names] +
-    [f"{name}_avg" for name in base_names]   # NEW average columns
+    [f"{name}_avg" for name in base_names]   # average columns
 )
 
 write_header = not os.path.exists(CSV_PATH) or os.path.getsize(CSV_PATH) == 0
@@ -88,7 +88,11 @@ try:
                     avg_val = math.nan
                 averages.append(avg_val)
 
-            row = [ts] + list(s1) + list(s2) + list(s3) + averages
+            # Format all numbers to 2 decimals (strings for CSV)
+            def fmt(x):
+                return f"{x:.2f}" if not math.isnan(x) else ""
+
+            row = [ts] + [fmt(v) for v in s1] + [fmt(v) for v in s2] + [fmt(v) for v in s3] + [fmt(v) for v in averages]
             writer.writerow(row)
             f.flush()
 
