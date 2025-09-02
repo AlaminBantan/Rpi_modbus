@@ -15,7 +15,7 @@ SM_600_1.clear_buffers_before_each_transaction = True
 SM_600_1.close_port_after_each_call = True
 
 # Register map (holding registers), float32 big-endian (MSB first)
-# PAR: 0, Temp: 2, RH: 4, CO2: 6, Pressure: 8, VPD: 10, Dew Point: 12
+# PAR: 0, Temp: 2, RH: 4, CO2: 6, Pressure: 8, VPD: 10, Dew Point: 12, Fan RPM: 14
 
 try:
     while True:
@@ -28,6 +28,7 @@ try:
         pressure  = SM_600_1.read_float(8, 3, 2, 0)
         vpd_kpa   = SM_600_1.read_float(10, 3, 2, 0)
         dewpoint  = SM_600_1.read_float(12, 3, 2, 0)
+        fanrpm  = SM_600_1.read_float(14, 3, 2, 0)
 
         print("\n" * 50)
         print("SM-600 Sensor Data--------------------------------")
@@ -38,6 +39,7 @@ try:
         print(f"Pressure    : {pressure:.2f} kPa")
         print(f"VPD         : {vpd_kpa:.3f} kPa")
         print(f"Dew Point   : {dewpoint:.2f} °C")
+        print(f"Fan RPM   : {fanrpm:.2f} rpm")
         print("-----------------------------------------------")
         sleep(10)
 
