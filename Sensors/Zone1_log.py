@@ -4,6 +4,7 @@ from datetime import datetime
 import csv
 import os
 import math
+import statistics
 
 CSV_DIR = "/home/cdacea/climate"
 CSV_PATH = os.path.join(CSV_DIR, "Zone1_minute.csv")
@@ -39,17 +40,19 @@ def read_sensor(sensor):
         return (par, temp_c, rh_pct, co2_ppm, pressure, vpd_kpa, dewpoint, fanrpm)
     except Exception as e:
         print(f"⚠️ Read error ({sensor.address}): {e}")
-        # Use NaNs to keep CSV shape consistent
         nan8 = (math.nan,)*8
         return nan8
 
 # --- Ensure directory and header ---
 os.makedirs(CSV_DIR, exist_ok=True)
+base_names = ["PAR","Temp","RH","CO2","Pressure","VPD","DewPoint","FanRPM"]
+
 header = (
     ["datetime"] +
-    [f"{name}_1" for name in ["PAR","Temp","RH","CO2","Pressure","VPD","DewPoint","FanRPM"]] +
-    [f"{name}_2" for name in ["PAR","Temp","RH","CO2","Pressure","VPD","DewPoint","FanRPM"]] +
-    [f"{name}_3" for name in ["PAR","Temp","RH","CO2","Pressure","VPD","DewPoint","FanRPM"]]
+    [f"{name}_1" for name in base_names] +
+    [f"{name}_2" for name in base_names] +
+    [f"{name}_3" for name in base_names] +
+    [f"{name}_avg" for name in base_names]   # NEW average columns
 )
 
 write_header = not os.path.exists(CSV_PATH) or os.path.getsize(CSV_PATH) == 0
@@ -66,21 +69,30 @@ try:
         while True:
             loop_start = monotonic()
 
-            # Timestamp
             ts = datetime.now().isoformat(timespec="seconds")
 
-            # Read sensors 1s apart to give the bus some breathing room
+            # Read three sensors 1s apart
             s1 = read_sensor(SM_600_1)
             sleep(1)
             s2 = read_sensor(SM_600_2)
             sleep(1)
             s3 = read_sensor(SM_600_3)
 
-            row = [ts] + list(s1) + list(s2) + list(s3)
+            # Compute averages (ignores NaN if possible)
+            averages = []
+            for idx in range(len(base_names)):
+                values = [s1[idx], s2[idx], s3[idx]]
+                try:
+                    avg_val = statistics.fmean(v for v in values if not math.isnan(v))
+                except Exception:
+                    avg_val = math.nan
+                averages.append(avg_val)
+
+            row = [ts] + list(s1) + list(s2) + list(s3) + averages
             writer.writerow(row)
             f.flush()
 
-            # Keep a steady 60s cadence from the loop start
+            # Keep a steady 60s cadence
             elapsed = monotonic() - loop_start
             sleep_time = max(0.0, 60.0 - elapsed)
             sleep(sleep_time)
