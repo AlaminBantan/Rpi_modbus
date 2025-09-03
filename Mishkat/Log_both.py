@@ -5,11 +5,21 @@ import csv
 import os
 import math
 import statistics
+import logging
 
 CSV_DIR = "/home/cdacea/climate"
 CSV1 = os.path.join(CSV_DIR, "Zone1_minute.csv")
 CSV3 = os.path.join(CSV_DIR, "Zone3_minute.csv")
 SERIAL_PORT = "/dev/ttyACM0"  # adjust if needed
+LOG_FILE = os.path.join(CSV_DIR, "Zone_logger.log")
+
+# ------------------- Logging setup -------------------
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logging.info("🌱 Zone logger started")
 
 # ------------------- Helpers -------------------
 def make_instrument(address):
@@ -40,7 +50,7 @@ def read_sensor(sensor):
             addr = sensor.address
         except Exception:
             addr = "?"
-        print(f"⚠️ Read error (addr {addr}): {e}")
+        logging.error(f"Read error (addr {addr}): {e}")
         return (math.nan,)*8
 
 def fmean_ignore_nan(values):
@@ -92,30 +102,28 @@ try:
             loop_start = monotonic()
             ts = datetime.now().isoformat(timespec="seconds")
 
-            # --- Zone 1: sensors 1,2,3 (1s spacing) ---
+            # --- Zone 1 ---
             s1 = read_sensor(SM_600_1); sleep(1)
             s2 = read_sensor(SM_600_2); sleep(1)
             s3 = read_sensor(SM_600_3)
-
             avg1 = [fmean_ignore_nan([s1[i], s2[i], s3[i]]) for i in range(len(base))]
             row1 = [ts] + [fmt2(v) for v in s1] + [fmt2(v) for v in s2] + [fmt2(v) for v in s3] + [fmt2(v) for v in avg1]
             w1.writerow(row1); f1.flush()
 
-            # --- Zone 3: sensors 4,5,6 (1s spacing) ---
+            # --- Zone 3 ---
             s4 = read_sensor(SM_600_4); sleep(1)
             s5 = read_sensor(SM_600_5); sleep(1)
             s6 = read_sensor(SM_600_6)
-
             avg3 = [fmean_ignore_nan([s4[i], s5[i], s6[i]]) for i in range(len(base))]
             row3 = [ts] + [fmt2(v) for v in s4] + [fmt2(v) for v in s5] + [fmt2(v) for v in s6] + [fmt2(v) for v in avg3]
             w3.writerow(row3); f3.flush()
 
-            # Keep a steady 60s cadence from start of loop
+            # Keep a steady 60s cadence
             elapsed = monotonic() - loop_start
             sleep(max(0.0, 60.0 - elapsed))
 
 except KeyboardInterrupt:
-    print("✅ Logging stopped. Ports now closing.")
+    logging.info("🌱 Logging stopped by user. Closing ports.")
     for inst in (SM_600_1, SM_600_2, SM_600_3, SM_600_4, SM_600_5, SM_600_6):
         try:
             inst.serial.close()
