@@ -18,7 +18,8 @@ SM_600_1.close_port_after_each_call = True
 
 #write_register(registeraddress: int, value: Union[int, float], number_of_decimals: int = 0, functioncode: int = 16, signed: bool = False) → None
 
-SM_600_1.write_register(120,4, 0, 16, False)
+SM_600_1.write_register(120,5, 0, 16, False)
+
 
 
 
