@@ -2,7 +2,7 @@ import minimalmodbus  # Don't forget to import the library!!
 from time import sleep
 
 # Make an "instrument" object called SM_600_4 (port name, slave address (in decimal))
-SM_600_4 = minimalmodbus.Instrument('/dev/ttyACM0', 6, debug=False)
+SM_600_4 = minimalmodbus.Instrument('/dev/ttyACM0', 4, debug=False)
 
 SM_600_4.serial.baudrate = 19200                             # BaudRate
 SM_600_4.serial.bytesize = 8                                 # Number of data bits to be requested
