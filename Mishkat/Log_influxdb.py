@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 # ====== InfluxDB 2.x / Cloud settings ======
 INFLUX_URL    = "https://us-east-1-1.aws.cloud2.influxdata.com"
-INFLUX_TOKEN  = "-Jhy0yP-3X3KBpvpxLXqlDDCa80BO69IOog93VaHRnQyQjGRgLOzGLI1ZwuOJrMJmifxez1f-RVEdNzO9Nvz8g=="
+INFLUX_TOKEN  = "pass"
 INFLUX_ORG    = "Mishkat greenhouse"
 INFLUX_BUCKET = "Mishkat_experiment"
 
