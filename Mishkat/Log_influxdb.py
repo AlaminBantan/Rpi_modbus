@@ -4,10 +4,11 @@ from time import sleep, monotonic
 from datetime import datetime, timezone
 
 # ====== InfluxDB 2.x / Cloud settings ======
-INFLUX_URL    = "https://us-east-1-1.aws.cloud2.influxdata.com"  # your cluster URL
-INFLUX_TOKEN  = ""            # <-- paste your API token (leave empty to disable Influx writes)
-INFLUX_ORG    = "your-org"    # <-- your org
-INFLUX_BUCKET = "your-bucket" # <-- your bucket
+INFLUX_URL    = "https://us-east-1-1.aws.cloud2.influxdata.com"
+INFLUX_TOKEN  = "-Jhy0yP-3X3KBpvpxLXqlDDCa80BO69IOog93VaHRnQyQjGRgLOzGLI1ZwuOJrMJmifxez1f-RVEdNzO9Nvz8g=="
+INFLUX_ORG    = "Mishkat greenhouse"
+INFLUX_BUCKET = "Mishkat_experiment"
+
 
 # ====== Files & serial ======
 CSV_DIR = "/home/cdacea/climate"
