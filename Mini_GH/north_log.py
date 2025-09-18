@@ -15,7 +15,7 @@ logging.basicConfig(filename='/home/cdacea/north_GH/sensor_data.log',
 # --- Sensor Configurations ---
 
 # SQ-618 PAR Sensor (ID=6)
-sq618_6 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 6)
+sq618_6 = minimalmodbus.Instrument('/dev/ttyACM0', 6)
 sq618_6.serial.baudrate = 19200
 sq618_6.serial.bytesize = 8
 sq618_6.serial.parity = minimalmodbus.serial.PARITY_EVEN
@@ -26,7 +26,7 @@ sq618_6.clear_buffers_before_each_transaction = True
 sq618_6.close_port_after_each_call = True
 
 # SP-522 Solar Radiation Sensor (ID=10)
-sp522_10 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 10)
+sp522_10 = minimalmodbus.Instrument('/dev/ttyACM0', 10)
 sp522_10.serial.baudrate = 19200
 sp522_10.serial.bytesize = 8
 sp522_10.serial.parity = minimalmodbus.serial.PARITY_EVEN
@@ -145,3 +145,4 @@ except KeyboardInterrupt:
     if gmp252_41.serial.is_open:
         gmp252_41.serial.close()
     logging.info("Ports Closed")
+
