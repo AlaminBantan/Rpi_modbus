@@ -13,7 +13,7 @@ logging.basicConfig(filename='/home/cdacea/north_GH/sensor_data.log',
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 # Configuration of SQ-618 ID=1
-PAR_6 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 6)
+PAR_6 = minimalmodbus.Instrument('/dev/ttyACM0', 6)
 PAR_6.serial.baudrate = 19200
 PAR_6.serial.bytesize = 8
 PAR_6.serial.parity = minimalmodbus.serial.PARITY_EVEN
@@ -138,4 +138,5 @@ except KeyboardInterrupt:
         carbo_41.serial.close()
 
     logging.info("Ports Closed")
+
 
