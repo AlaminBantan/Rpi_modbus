@@ -13,26 +13,26 @@ logging.basicConfig(filename='/home/cdacea/north_GH/sensor_data.log',
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 # Configuration of SQ-618 ID=1
-PAR_1 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 1)
-PAR_1.serial.baudrate = 19200
-PAR_1.serial.bytesize = 8
-PAR_1.serial.parity = minimalmodbus.serial.PARITY_EVEN
-PAR_1.serial.stopbits = 1
-PAR_1.serial.timeout = 0.5
-PAR_1.mode = minimalmodbus.MODE_RTU
-PAR_1.clear_buffers_before_each_transaction = True
-PAR_1.close_port_after_each_call = True
+PAR_6 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 6)
+PAR_6.serial.baudrate = 19200
+PAR_6.serial.bytesize = 8
+PAR_6.serial.parity = minimalmodbus.serial.PARITY_EVEN
+PAR_6.serial.stopbits = 1
+PAR_6.serial.timeout = 0.5
+PAR_6.mode = minimalmodbus.MODE_RTU
+PAR_6.clear_buffers_before_each_transaction = True
+PAR_6.close_port_after_each_call = True
 
 # Configuration of SP-522 ID=13
-Solar_13 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 13)
-Solar_13.serial.baudrate = 19200
-Solar_13.serial.bytesize = 8
-Solar_13.serial.parity = minimalmodbus.serial.PARITY_EVEN
-Solar_13.serial.stopbits = 1
-Solar_13.serial.timeout = 0.5
-Solar_13.mode = minimalmodbus.MODE_RTU
-Solar_13.clear_buffers_before_each_transaction = True
-Solar_13.close_port_after_each_call = True
+Solar_10 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 10)
+Solar_10.serial.baudrate = 19200
+Solar_10.serial.bytesize = 8
+Solar_10.serial.parity = minimalmodbus.serial.PARITY_EVEN
+Solar_10.serial.stopbits = 1
+Solar_10.serial.timeout = 0.5
+Solar_10.mode = minimalmodbus.MODE_RTU
+Solar_10.clear_buffers_before_each_transaction = True
+Solar_10.close_port_after_each_call = True
 
 # Configuration of GMP-252 ID=41
 carbo_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41)
@@ -80,17 +80,17 @@ try:
             formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M")
 
             try:
-                PAR_intensity_1 = round(PAR_1.read_float(0, 3, 2, 0), 1)
+                PAR_intensity_1 = round(PAR_6.read_float(0, 3, 2, 0), 1)
                 sleep(1)
             except Exception as e:
-                logging.error(f"Error reading PAR_1: {e}")
+                logging.error(f"Error reading PAR_6: {e}")
                 PAR_intensity_1 = "error"
 
             try:
-                Solar_Radiation_13 = round(Solar_13.read_float(0, 3, 2, 0), 1)
+                Solar_Radiation_13 = round(Solar_10.read_float(0, 3, 2, 0), 1)
                 sleep(1)
             except Exception as e:
-                logging.error(f"Error reading Solar_13: {e}")
+                logging.error(f"Error reading Solar_10: {e}")
                 Solar_Radiation_13 = "error"
 
             try:
@@ -130,11 +130,12 @@ try:
             sleep(53)
 
 except KeyboardInterrupt:
-    if PAR_1.serial.is_open:
-        PAR_1.serial.close()
-    if Solar_13.serial.is_open:
-        Solar_13.serial.close()
+    if PAR_6.serial.is_open:
+        PAR_6.serial.close()
+    if Solar_10.serial.is_open:
+        Solar_10.serial.close()
     if carbo_41.serial.is_open:
         carbo_41.serial.close()
 
     logging.info("Ports Closed")
+
