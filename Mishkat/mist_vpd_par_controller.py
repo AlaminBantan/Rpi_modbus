@@ -14,7 +14,7 @@ ACTIONS_CSV = os.path.join(CSV_DIR, "mist_actions.csv")  # NEW
 PUMP_PIN = 17
 Z1_PIN   = 27
 Z3_PIN   = 22
-ACTIVE_HIGH = True      # set False if your relays are active-LOW
+ACTIVE_HIGH = False     # set False if your relays are active-LOW
 
 # Pump sequencing
 PUMP_LEAD_SEC = 1.0     # pump on before opening valve
