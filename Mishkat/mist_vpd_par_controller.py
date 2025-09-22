@@ -16,9 +16,9 @@ Z1_PIN   = 27
 Z3_PIN   = 22
 ACTIVE_HIGH = False     # set False if your relays are active-LOW
 
-# Pump sequencing
-PUMP_LEAD_SEC = 1.0     # pump on before opening valve
-PUMP_LAG_SEC  = 2.0     # pump off after closing last valve
+# Sequencing
+VALVE_LEAD_SEC = 1.0    # valve on before pump
+PUMP_LAG_SEC   = 0.0    # pump off at same time valve closes
 
 # Data freshness
 MAX_DATA_AGE_SEC = 5 * 60   # stale if older than 5 minutes
@@ -69,17 +69,10 @@ def parse_iso(ts: str) -> Optional[datetime]:
         return None
 
 def read_latest_avg(csv_path: str) -> Tuple[Optional[float], Optional[float], Optional[datetime]]:
-    """
-    Robust reader for files with header:
-      datetime, ..., PAR_avg, ..., VPD_avg, ...
-    - Strips NUL bytes to avoid csv errors.
-    - Uses the last non-empty data line.
-    Returns (vpd_avg, par_avg, timestamp) or (None, None, None) on failure.
-    """
+    """Read last line, strip NULs, parse VPD_avg + PAR_avg."""
     if not os.path.exists(csv_path) or os.path.getsize(csv_path) == 0:
         return (None, None, None)
     try:
-        # Read raw bytes and remove NULs to avoid "line contains NUL"
         with open(csv_path, "rb") as fb:
             raw = fb.read()
         if b"\x00" in raw:
@@ -87,17 +80,12 @@ def read_latest_avg(csv_path: str) -> Tuple[Optional[float], Optional[float], Op
             raw = raw.replace(b"\x00", b"")
         text = raw.decode("utf-8", errors="replace")
 
-        # Keep non-empty lines only
         lines = [ln for ln in text.splitlines() if ln.strip()]
         if len(lines) < 2:
             return (None, None, None)
 
-        header_line = lines[0]
-        data_line   = lines[-1]
-
-        # Parse header and last data line
-        header = next(csv.reader([header_line]))
-        row    = next(csv.reader([data_line]))
+        header = next(csv.reader([lines[0]]))
+        row    = next(csv.reader([lines[-1]]))
 
         def find(col):
             for i, h in enumerate(header):
@@ -110,22 +98,17 @@ def read_latest_avg(csv_path: str) -> Tuple[Optional[float], Optional[float], Op
         i_vpd = find("VPD_avg")
         i_par = find("PAR_avg")
         if min(i_dt, i_vpd, i_par) < 0 or max(i_dt, i_vpd, i_par) >= len(row):
-            logging.error(f"Missing required columns in {csv_path}: {header}")
             return (None, None, None)
 
         ts = parse_iso(row[i_dt].strip())
-        if not ts:
-            return (None, None, None)
-
         def to_float(s):
             try:
                 s = s.strip()
                 if s == "" or s.lower() == "nan":
                     return math.nan
                 return float(s)
-            except Exception:
+            except:
                 return math.nan
-
         vpd = to_float(row[i_vpd])
         par = to_float(row[i_par])
         if math.isnan(vpd) or math.isnan(par):
@@ -138,23 +121,19 @@ def read_latest_avg(csv_path: str) -> Tuple[Optional[float], Optional[float], Op
         return (None, None, None)
 
 def fresh(ts: Optional[datetime]) -> bool:
-    if not ts:
-        return False
-    if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=timezone.utc)
+    if not ts: return False
+    if ts.tzinfo is None: ts = ts.replace(tzinfo=timezone.utc)
     return (datetime.now(timezone.utc) - ts).total_seconds() <= MAX_DATA_AGE_SEC
 
 def pick_mist_duration(vpd: float) -> Optional[float]:
-    if vpd is None:
-        return None
+    if vpd is None: return None
     if 0.7 <= vpd < 1.0: return 7.0
     if 1.0 <= vpd < 1.5: return 9.0
     if 1.5 <= vpd < 2.5: return 11.0
     return None
 
 def pick_wait_interval(par: float) -> Optional[float]:
-    if par is None:
-        return None
+    if par is None: return None
     if par < 200.0: return None
     if 1000.0 <= par < 2000.0: return 15 * 60
     if  800.0 <= par < 1000.0: return 20 * 60
@@ -187,8 +166,7 @@ def log_action(zone_name: str, vpd: float, par: float, dur: float, wait_sec: flo
         logging.error(f"Failed to write actions CSV: {e}")
 
 # ================= Scheduler =================
-# z3 disabled by setting its eligibility to infinity
-next_ok = {"z1": 0.0, "z3": float("inf")}
+next_ok = {"z1": 0.0, "z3": float("inf")}  # z3 disabled
 state_pump = False
 last_valve_closed_t = 0.0
 
@@ -203,15 +181,24 @@ def run_mist(zone_name: str, valve_dev, vpd: float, par: float):
 
     logging.info(f"{zone_name}: MIST start — VPD={vpd:.2f}, PAR={par:.1f}, dur={dur}s, next_wait={int(wait/60)}m")
 
+    # Open valve first
+    dev_set(valve_dev, f"{zone_name.upper()}_VALVE", True)
+    time.sleep(VALVE_LEAD_SEC)
+
+    # Then pump on
     if not state_pump:
         dev_set(pump, "PUMP", True)
         state_pump = True
-        time.sleep(PUMP_LEAD_SEC)
 
-    dev_set(valve_dev, f"{zone_name.upper()}_VALVE", True)
-    time.sleep(dur)
+    # Continue misting for the duration (minus the 1s lead already elapsed)
+    time.sleep(max(0.0, dur - VALVE_LEAD_SEC))
+
+    # Close valve and pump together
     dev_set(valve_dev, f"{zone_name.upper()}_VALVE", False)
     last_valve_closed_t = time.monotonic()
+    if state_pump:
+        dev_set(pump, "PUMP", False)
+        state_pump = False
 
     log_action(zone_name, vpd, par, dur, wait)
 
@@ -223,11 +210,11 @@ try:
     while True:
         now_mono = time.monotonic()
         z1_ready = now_mono >= next_ok["z1"]
-        z3_ready = now_mono >= next_ok["z3"]  # will always be False (inf)
+        z3_ready = now_mono >= next_ok["z3"]
 
         to_try = []
         if z1_ready: to_try.append(("z1", CSV_Z1, z1))
-        if z3_ready: to_try.append(("z3", CSV_Z3, z3))  # effectively disabled
+        if z3_ready: to_try.append(("z3", CSV_Z3, z3))
 
         did_any = False
         for name, csv_path, dev in to_try:
@@ -239,13 +226,7 @@ try:
                 continue
             run_mist(name, dev, vpd, par)
             did_any = True
-            break  # mutual exclusion: only one zone per pass
-
-        if not did_any and state_pump:
-            since_close = time.monotonic() - last_valve_closed_t
-            if since_close >= PUMP_LAG_SEC:
-                dev_set(pump, "PUMP", False)
-                state_pump = False
+            break  # only one zone per cycle
 
         time.sleep(SCHED_TICK_SEC)
 
