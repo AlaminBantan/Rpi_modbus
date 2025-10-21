@@ -166,7 +166,7 @@ def log_action(zone_name: str, vpd: float, par: float, dur: float, wait_sec: flo
         logging.error(f"Failed to write actions CSV: {e}")
 
 # ================= Scheduler =================
-next_ok = {"z1": 0.0, "z3": float("inf")}  # z3 disabled
+next_ok = {"z1": 0.0, "z3": 0.0}  #both zones active, to disable one zone replace 0.0 with float("inf")
 state_pump = False
 last_valve_closed_t = 0.0
 
