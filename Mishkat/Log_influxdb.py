@@ -86,12 +86,29 @@ def fmean_ignore_nan(values):
 def fmt2(x):
     return f"{x:.2f}" if not math.isnan(x) else ""
 
+# ====== Plant VPD helpers ======
+def esat_kpa(Tc: float) -> float:
+    """Saturation vapor pressure (kPa) at temperature Tc (°C). Tetens formula."""
+    return 0.6108 * math.exp((17.27 * Tc) / (Tc + 237.3))
+
+def plant_vpd_kpa(air_Tc: float, RH_pct: float, leaf_Tc: float) -> float:
+    """
+    VPD_leaf = es(T_leaf) - ea_air, where ea_air = RH * es(T_air) / 100.
+    Clamp at >= 0.
+    """
+    if any(math.isnan(v) for v in (air_Tc, RH_pct, leaf_Tc)):
+        return math.nan
+    ea_air = (RH_pct / 100.0) * esat_kpa(air_Tc)
+    vpd = esat_kpa(leaf_Tc) - ea_air
+    return max(0.0, vpd)
+
 # ====== Setup CSV headers ======
 base = ["PAR","Temp","RH","CO2","Pressure","VPD","DewPoint","FanRPM"]
+# We will append two extra *avg* columns: PlantTemp_avg, PlantVPD_avg
 hdr1 = (["datetime"] + [f"{n}_1" for n in base] + [f"{n}_2" for n in base] +
-        [f"{n}_3" for n in base] + [f"{n}_avg" for n in base])
+        [f"{n}_3" for n in base] + [f"{n}_avg" for n in base] + ["PlantTemp_avg","PlantVPD_avg"])
 hdr3 = (["datetime"] + [f"{n}_4" for n in base] + [f"{n}_5" for n in base] +
-        [f"{n}_6" for n in base] + [f"{n}_avg" for n in base])
+        [f"{n}_6" for n in base] + [f"{n}_avg" for n in base] + ["PlantTemp_avg","PlantVPD_avg"])
 
 write_hdr1 = not os.path.exists(CSV1) or os.path.getsize(CSV1) == 0
 write_hdr3 = not os.path.exists(CSV3) or os.path.getsize(CSV3) == 0
@@ -132,15 +149,29 @@ try:
             s2 = read_sensor(SM_600_2); sleep(1)
             s3 = read_sensor(SM_600_3)
 
+            # avg1 over the 8 base vars
             avg1 = [fmean_ignore_nan([s1[i], s2[i], s3[i]]) for i in range(len(base))]
-            row1 = [ts_csv] + [fmt2(v) for v in s1] + [fmt2(v) for v in s2] + [fmt2(v) for v in s3] + [fmt2(v) for v in avg1]
+            PAR1, Tair1, RH1, CO21, P1, VPD1, Dew1, Fan1 = avg1
+
+            # plant metrics (avg): T_leaf = T_air - 2 C; VPD_leaf = es(T_leaf) - RH*es(T_air)
+            plantT1 = Tair1 - 2.0 if not math.isnan(Tair1) else math.nan
+            plantVPD1 = plant_vpd_kpa(Tair1, RH1, plantT1)
+
+            row1 = (
+                [ts_csv]
+                + [fmt2(v) for v in s1] + [fmt2(v) for v in s2] + [fmt2(v) for v in s3]
+                + [fmt2(v) for v in avg1] + [fmt2(plantT1), fmt2(plantVPD1)]
+            )
             w1.writerow(row1); f1.flush()
 
-            # Influx (comment out individual sensors if you only want averages)
+            # Influx (individual sensors unchanged)
             write_influx("1", "1",   base, s1,   ts_dt_utc)
             write_influx("1", "2",   base, s2,   ts_dt_utc)
             write_influx("1", "3",   base, s3,   ts_dt_utc)
-            write_influx("1", "avg", base, avg1, ts_dt_utc)
+            # avg + plant metrics
+            names_avg1  = base + ["PlantTemp","PlantVPD"]
+            values_avg1 = avg1 + [plantT1, plantVPD1]
+            write_influx("1", "avg", names_avg1, values_avg1, ts_dt_utc)
 
             # ---- Zone 3: sensors 4,5,6 (1s spacing) ----
             s4 = read_sensor(SM_600_4); sleep(1)
@@ -148,13 +179,24 @@ try:
             s6 = read_sensor(SM_600_6)
 
             avg3 = [fmean_ignore_nan([s4[i], s5[i], s6[i]]) for i in range(len(base))]
-            row3 = [ts_csv] + [fmt2(v) for v in s4] + [fmt2(v) for v in s5] + [fmt2(v) for v in s6] + [fmt2(v) for v in avg3]
+            PAR3, Tair3, RH3, CO23, P3, VPD3, Dew3, Fan3 = avg3
+
+            plantT3 = Tair3 - 2.0 if not math.isnan(Tair3) else math.nan
+            plantVPD3 = plant_vpd_kpa(Tair3, RH3, plantT3)
+
+            row3 = (
+                [ts_csv]
+                + [fmt2(v) for v in s4] + [fmt2(v) for v in s5] + [fmt2(v) for v in s6]
+                + [fmt2(v) for v in avg3] + [fmt2(plantT3), fmt2(plantVPD3)]
+            )
             w3.writerow(row3); f3.flush()
 
             write_influx("3", "4",   base, s4,   ts_dt_utc)
             write_influx("3", "5",   base, s5,   ts_dt_utc)
             write_influx("3", "6",   base, s6,   ts_dt_utc)
-            write_influx("3", "avg", base, avg3, ts_dt_utc)
+            names_avg3  = base + ["PlantTemp","PlantVPD"]
+            values_avg3 = avg3 + [plantT3, plantVPD3]
+            write_influx("3", "avg", names_avg3, values_avg3, ts_dt_utc)
 
             # keep a steady 60s cadence
             sleep(max(0.0, 60.0 - (monotonic() - loop_start)))
