@@ -4,7 +4,7 @@ from time import sleep
 
 
 # Make an "instrument" object called carbo_41 (port name, slave address (in decimal))
-carbo_41 = minimalmodbus.Instrument('/dev/ttyUSB0', 41, debug=False)	
+carbo_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41, debug=False)	
 
 carbo_41.serial.baudrate = 19200 				# BaudRate
 carbo_41.serial.bytesize = 8					# Number of data bits to be requested
@@ -35,3 +35,4 @@ except KeyboardInterrupt:
 	# Piece of mind close out
 	carbo_41.serial.close()
 	print("Ports Now Closed")
+
