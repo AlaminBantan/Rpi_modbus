@@ -40,8 +40,8 @@ sp522_10.close_port_after_each_call = True
 gmp252_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41)
 gmp252_41.serial.baudrate = 19200
 gmp252_41.serial.bytesize = 8
-gmp252_41.serial.parity = minimalmodbus.serial.PARITY_NONE
-gmp252_41.serial.stopbits = 2
+gmp252_41.serial.parity = minimalmodbus.serial.PARITY_EVEN
+gmp252_41.serial.stopbits = 1
 gmp252_41.serial.timeout = 0.8
 gmp252_41.mode = minimalmodbus.MODE_RTU
 gmp252_41.clear_buffers_before_each_transaction = True
@@ -145,6 +145,7 @@ except KeyboardInterrupt:
     if gmp252_41.serial.is_open:
         gmp252_41.serial.close()
     logging.info("Ports Closed")
+
 
 
 
