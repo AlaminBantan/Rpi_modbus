@@ -14,7 +14,7 @@ PH_1.close_port_after_each_call = True
 
 print("Scanning registers 0-199 with FC3...")
 
-for addr in range(0, 200):
+for addr in range(0, 999):
     try:
         val = PH_1.read_register(addr, 0, functioncode=3, signed=False)
     except Exception as e:
