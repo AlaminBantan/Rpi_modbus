@@ -1,31 +1,22 @@
 import minimalmodbus
 
-ph = minimalmodbus.Instrument('/dev/ttyUSB0', 1)  # same as your working reader
+PH_1 = minimalmodbus.Instrument('/dev/ttyUSB0', 1)
 
-# EXACT same serial config as your working pH reader
-ph.serial.baudrate = 9600
-ph.serial.bytesize = 8
-ph.serial.parity   = minimalmodbus.serial.PARITY_NONE
-ph.serial.stopbits = 1
-ph.serial.timeout  = 0.5
-ph.mode = minimalmodbus.MODE_RTU
+PH_1.serial.baudrate = 9600
+PH_1.serial.bytesize = 8
+PH_1.serial.parity   = minimalmodbus.serial.PARITY_NONE
+PH_1.serial.stopbits = 1
+PH_1.serial.timeout  = 0.5
+PH_1.mode = minimalmodbus.MODE_RTU
 
-ph.clear_buffers_before_each_transaction = True
-ph.close_port_after_each_call = True
+PH_1.clear_buffers_before_each_transaction = True
+PH_1.close_port_after_each_call = True
 
-# ---- TEST READS ONLY ----
-# 1) Read pH register (0) to confirm comms
-ph_raw = ph.read_register(0, 0, functioncode=3, signed=False)
-print("Test pH raw:", ph_raw, "->", ph_raw/100.0, "pH")
+# Read pH just to confirm comms
+ph_raw = PH_1.read_register(0, 0, functioncode=3, signed=False)
+print("pH raw:", ph_raw, "->", ph_raw / 100.0)
 
-# 2) Read baud-code register 103 (should be 3 for 9600 by default)
-baud_code = ph.read_register(103, 0, functioncode=3, signed=False)
-print("Current baud code at reg 103:", baud_code)
-
-#baud_code = ph.read_register(103, 0, functioncode=4, signed=False)
-#print("Baud register (FC4):", baud_code)
-
-raw = ph.read_registers(103, 1, functioncode=3)
-print("Raw 103:", raw)
-
-
+print("Config registers 100–105 (FC3):")
+for addr in range(100, 106):
+    val = PH_1.read_register(addr, 0, functioncode=3, signed=False)
+    print(addr, ":", val)
