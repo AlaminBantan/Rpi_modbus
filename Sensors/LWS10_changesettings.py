@@ -28,4 +28,4 @@ LW_1.write_register(516, 1, functioncode=6)   # DATABITS 8 bits
 LW_1.write_register(517, 0, functioncode=6)   # STOPBITS 1 stop bit
 
 # OPTIONAL: change slave address (if you want, otherwise skip)
-LW_1.write_register(512, 10, functioncode=6)   # SLAVEADDRESS = 10
+LW_1.write_register(512, 30, functioncode=6)   # SLAVEADDRESS = 10
