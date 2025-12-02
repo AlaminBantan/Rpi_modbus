@@ -1,43 +1,43 @@
-import minimalmodbus # Don't forget to import the library!!
+import minimalmodbus
 from time import sleep
 
-LW_1 = minimalmodbus.Instrument('/dev/ttyUSB0',1)	# Make an "instrument" object called LW_1 (port name, slave address (in decimal))
+LW_1 = minimalmodbus.Instrument('/dev/ttyUSB0', 1)
 
-LW_1.serial.baudrate = 9600	
-LW_1.serial.bytesize = 8					# Number of data bits to be requested
-LW_1.serial.parity = minimalmodbus.serial.PARITY_NONE	# Parity Setting here is NONE but can be ODD or EVEN
-LW_1.serial.stopbits = 1					# Number of stop bits
-LW_1.serial.timeout  = 0.5					# Timeout time in seconds
-LW_1.mode = minimalmodbus.MODE_RTU				# Mode to be used (RTU or ascii mode)
+LW_1.serial.baudrate = 9600
+LW_1.serial.bytesize = 8
+LW_1.serial.parity   = minimalmodbus.serial.PARITY_NONE
+LW_1.serial.stopbits = 1
+LW_1.serial.timeout  = 0.5
+LW_1.mode = minimalmodbus.MODE_RTU
 
-# Good practice to clean up before and after each execution
 LW_1.clear_buffers_before_each_transaction = True
 LW_1.close_port_after_each_call = True
 
-
 try:
-	while True:
-		
-		# ~ read_float(registeraddress: int, functioncode: int = 3, number_of_registers: int = 2, byteorder: int = 0) 
-		LW_intensity_1 = LW_1.read_float(0, 3, 2, 0)
+    while True:
+        # Temperature (°C)
+        temp_c = LW_1.read_register(
+            0,
+            number_of_decimals=2,
+            functioncode=3,
+            signed=True
+        )
 
-	
-		
-		print("\n"*50)
-		print("Sensor Data--------------------------------")
-		print(f"LW is: {LW_intensity_1}")
+        # Wetness (%)
+        wetness = LW_1.read_register(
+            1,
+            number_of_decimals=2,
+            functioncode=3,
+            signed=False
+        )
 
+        print("\n" * 50)
+        print("Sensor Data--------------------------------")
+        print(f"Temperature: {temp_c:.2f} °C")
+        print(f"Wetness:     {wetness:.2f} %")
+        print("------------------------------------------")
+        sleep(1)
 
-		print("------------------------------------------")
-		
-		print("")
-		print("")
-		print("")
-		sleep(1)
-	
-	
 except KeyboardInterrupt:
-	
-	# Piece of mind close out
-	LW_1.serial.close()
-	print("Ports Now Closed")
+    LW_1.serial.close()
+    print("Ports Now Closed")
