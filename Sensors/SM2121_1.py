@@ -22,8 +22,8 @@ print("Test pH raw:", ph_raw, "->", ph_raw/100.0, "pH")
 baud_code = ph.read_register(103, 0, functioncode=3, signed=False)
 print("Current baud code at reg 103:", baud_code)
 
-baud_code = ph.read_register(103, 0, functioncode=4, signed=False)
-print("Baud register (FC4):", baud_code)
+#baud_code = ph.read_register(103, 0, functioncode=4, signed=False)
+#print("Baud register (FC4):", baud_code)
 
 raw = ph.read_registers(103, 1, functioncode=3)
 print("Raw 103:", raw)
