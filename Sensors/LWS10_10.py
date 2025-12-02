@@ -1,7 +1,7 @@
 import minimalmodbus
 from time import sleep
 
-LW_1 = minimalmodbus.Instrument('/dev/ttyUSB0', 1)
+LW_1 = minimalmodbus.Instrument('/dev/ttyUSB0', 10)
 
 LW_1.serial.baudrate = 19200
 LW_1.serial.bytesize = 8
