@@ -19,7 +19,7 @@ try:
 	while True:
 		
 		# ~ read_float(registeraddress: int, functioncode: int = 3, number_of_registers: int = 2, byteorder: int = 0) 
-		LW_intensity_1 = LW_1.read_float(1, 3, 1, 0)
+		LW_intensity_1 = LW_1.read_float(0, 3, 2, 0)
 
 	
 		
