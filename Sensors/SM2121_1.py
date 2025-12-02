@@ -16,7 +16,7 @@ PH_1.close_port_after_each_call = True
 ph_raw = PH_1.read_register(0, 0, functioncode=3, signed=False)
 print("pH raw:", ph_raw, "->", ph_raw / 100.0)
 
-print("Config registers 100–105 (FC3):")
+print("Config registers 100-105 (FC3):")
 for addr in range(100, 106):
     val = PH_1.read_register(addr, 0, functioncode=3, signed=False)
     print(addr, ":", val)
