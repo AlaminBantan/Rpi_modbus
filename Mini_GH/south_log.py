@@ -18,7 +18,7 @@ PAR_2.serial.baudrate = 19200
 PAR_2.serial.bytesize = 8
 PAR_2.serial.parity = minimalmodbus.serial.PARITY_EVEN
 PAR_2.serial.stopbits = 1
-PAR_2.serial.timeout = 0.5
+PAR_2.serial.timeout = 0.8
 PAR_2.mode = minimalmodbus.MODE_RTU
 PAR_2.clear_buffers_before_each_transaction = True
 PAR_2.close_port_after_each_call = True
@@ -35,11 +35,12 @@ Solar_12.clear_buffers_before_each_transaction = True
 Solar_12.close_port_after_each_call = True
 
 # Configuration of GMP-252 ID=41
-carbo_42 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 42)
+carbo_42 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41)
 carbo_42.serial.baudrate = 19200
 carbo_42.serial.bytesize = 8
 carbo_42.serial.parity = minimalmodbus.serial.PARITY_NONE
-carbo_42.serial.stopbits = 2
+carbo_42.serial.stopbits = 1
+Solar_12.serial.timeout = 0.8
 carbo_42.mode = minimalmodbus.MODE_RTU
 carbo_42.clear_buffers_before_each_transaction = True
 carbo_42.close_port_after_each_call = True
@@ -136,3 +137,4 @@ except KeyboardInterrupt:
     if carbo_42.serial.is_open:
         carbo_42.serial.close()
     logging.info("Ports Closed")
+
