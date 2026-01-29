@@ -37,7 +37,7 @@ sp522_10.clear_buffers_before_each_transaction = True
 sp522_10.close_port_after_each_call = True
 
 # GMP-252 CO₂ Sensor (ID=41)
-gmp252_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 41)
+gmp252_41 = minimalmodbus.Instrument('/dev/ttyACM_modbus', 42)
 gmp252_41.serial.baudrate = 19200
 gmp252_41.serial.bytesize = 8
 gmp252_41.serial.parity = minimalmodbus.serial.PARITY_EVEN
@@ -145,6 +145,7 @@ except KeyboardInterrupt:
     if gmp252_41.serial.is_open:
         gmp252_41.serial.close()
     logging.info("Ports Closed")
+
 
 
 
