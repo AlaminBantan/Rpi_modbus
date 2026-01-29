@@ -29,7 +29,7 @@ Solar_12.serial.baudrate = 19200
 Solar_12.serial.bytesize = 8
 Solar_12.serial.parity = minimalmodbus.serial.PARITY_EVEN
 Solar_12.serial.stopbits = 1
-Solar_12.serial.timeout = 0.5
+Solar_12.serial.timeout = 0.8
 Solar_12.mode = minimalmodbus.MODE_RTU
 Solar_12.clear_buffers_before_each_transaction = True
 Solar_12.close_port_after_each_call = True
@@ -137,5 +137,6 @@ except KeyboardInterrupt:
     if carbo_42.serial.is_open:
         carbo_42.serial.close()
     logging.info("Ports Closed")
+
 
 
